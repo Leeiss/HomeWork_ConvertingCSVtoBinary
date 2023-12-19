@@ -80,7 +80,6 @@ std::istream& operator>>(std::istream& is, DBfield& f) {
     delete[] f.favourite_color;
     f.favourite_color = new char[token.size() + 1];
     strcpy(f.favourite_color, token.c_str());
-
     std::getline(iss, token,',');
     delete[] f.shirt_size;
     f.shirt_size = new char[token.size() + 1];
@@ -117,8 +116,8 @@ public:
     string path, path2;
     FileReader(string p, string p2):path(p),path2(p2){};
     void get_separate_str(vector<string>& str_v, const string& str) {
-        auto iter = str.begin();
-        auto slow_iter = str.begin();
+        auto iter = str.begin(); // для прохода по символам строки
+        auto slow_iter = str.begin(); //для отслеживания начала каждой подстроки
         for(;iter != str.end(); ++iter) {
             if (*iter == ',') {
               str_v.emplace_back(slow_iter, iter);
@@ -143,7 +142,7 @@ public:
             regex pattern3(R"(^#[0-9A-Fa-f]{3}$|^#[0-9A-Fa-f]{6}$)");
             if (!regex_match(v[7], pattern3)) throw string("Not a \"shirt_color\" field in row " + to_string(str_num) + "\n");
             for (auto c : v[9]) {
-                if (isdigit(c)) continue;
+                if (isdigit(c)) continue;// isdigit проверка на цифру 
                 else throw string("Not an \"age\" field in row " + to_string(str_num) + "\n");
             }
             regex pattern2(R"(^[2-9XSLM]{1,3}$)");
@@ -156,17 +155,19 @@ public:
         while (getline(file_read, str)) {
             cout << str;
         }
-        file_read.close(); 
+       
+        file_read.close(); //закрыли поток
+        
     };
     void is_valid() {
         fstream file_write_from(path);
         string st;
         getline(file_write_from, st);
 
-        for (int i = 2; i < atoi(st.c_str())+2; i++) {
+        for (int i = 2; i < atoi(st.c_str())+2; i++) {// преобразуем строку в численное значение
             string str;
             getline(file_write_from, str);
-            vector<string> ans;
+            vector<string> ans;//для хранения элементов разделенной строки
             get_separate_str(ans,str);
             is_str_valid(ans, i + 2);
         }
@@ -183,13 +184,10 @@ public:
             file_write_from >> f;
             bin_file << f;
         }
-        file_write_from.close(); //закрыли поток
+        file_write_from.close();
         bin_file.close();
     };
-    void readBinary(){
-        //DBfield f;
-        //fileInBinary >> f; //необходимо считать данные из бинарного файла в структуру
-    };
+   
     void writeBinary(){
         ofstream new_file("../"+getNewFileName(path));
         ifstream file_write_from(path2, ios::binary);
